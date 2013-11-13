@@ -2,17 +2,55 @@
 
 Wraps the UserApp PHP client into a small and user-friendly API.
 
+## Example
+	
+	use \UserApp\Widget\User;
+	
+	User::setAppId("YOUR APP ID");
+	
+	if(!User::authenticated()){
+		if(User::login("epic", "catrider11!")){
+			echo("Successfully logged in<br />\n");
+		}else{
+			echo("Invalid username or password.<br />\n");
+		}
+	}
+	
+	if(User::authenticated()){
+		$user = User::current();
+		
+		if($user->hasPermission("admin")){
+			echo("User is admin!\n");
+		}
+		
+		echo("User id: " . $user->user_id . "<br />\n");
+		echo("First name: " . $user->first_name);
+		
+		$user->logout();
+	}
+
+## API
+
 ### Logging in
 
-    bool User::login($username, $password);
+    bool User::login($username, $password)
+
+### Signing up a new user
+
+    bool User::signup($username, $password, $email = null, $auto_login = true)
 
 ### Checking if a user is authenticated
 
-    bool User::authenticated();
+    bool User::authenticated()
 
 ### Getting the currently authenticated user
 
+    User User::current()
+
+#### Example
+
     $user = User::current();
+    $user->logout();
 
 ### Reading a property off a user
 
@@ -38,15 +76,15 @@ Wraps the UserApp PHP client into a small and user-friendly API.
 
 ### Checking whether a user has a permission
 
-    $user->hasPermission("admin");
+    bool $user->hasPermission($permission_name)
 
 ### Checking whether a user has a feature
 
-    $user->hasPermission("sms");
+    bool $user->hasFeature($feature_name)
 
 ### Logging out a user
 
-    $user->logout()
+    void $user->logout()
 
 ### Licence
 
