@@ -35,6 +35,10 @@ Wraps the UserApp PHP client into a small and user-friendly API.
 
     bool User::login($username, $password)
 
+### Logging in with a token
+
+    bool User::loginWithToken($token)
+
 ### Signing up a new user
 
     bool User::signup($username, $password, $email = null, $auto_login = true)
@@ -81,6 +85,21 @@ Wraps the UserApp PHP client into a small and user-friendly API.
 ### Checking whether a user has a feature
 
     bool $user->hasFeature($feature_name)
+
+### Setting a property on a user
+
+	$user->first_name = 'John';
+	$user->save();
+
+### Setting a feature on a user
+
+	$user->features->my_feature = true;
+	$user->save();
+
+### Setting a custom property on a user
+
+	$user->properties->my_property = 'Some value';
+	$user->save();
 
 ### Logging out a user
 
