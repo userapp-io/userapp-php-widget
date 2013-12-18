@@ -100,7 +100,7 @@
 
                 $session = self::getSession();
                 $session->set('ua_token', $token);
-                $session->set('ua_user_id', $result->user_id);
+                $session->set('ua_user_id', $result[0]->user_id);
 
                 return true;
             }catch(ServiceException $exception){
