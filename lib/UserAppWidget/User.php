@@ -2,6 +2,7 @@
 
 	namespace UserApp\Widget;
 
+    use \stdClass;
 	use \Exception;
     use \UserApp\Exceptions\ServiceException;
 
@@ -10,10 +11,15 @@
         private $_user_id;
         private $_data = null;
         private $_loaded = false;
+        private $_changed = array();
 
 		public function __construct($app_id, $session_token, $user_id){
             $client = $this->_client = new \UserApp\API($app_id, $session_token);
-            $client->setTransport(new \UserApp\Http\CurlTransport(false));
+
+            if($client->getOptions()->debug){
+                $client->setTransport(new \UserApp\Http\CurlTransport(false));
+            }
+
             $this->_user_id = $user_id;
 		}
 
@@ -31,22 +37,39 @@
             return $this->_data->$name;
         }
 
-        /*public function __set($name, $value){
-            $this->$name = $value;
-        }*/
-
-        public function hasPermission($permission){
-            if($this->_loaded){
-                return isset($this->permission->$permission)
-                    && $this->permission->$permission->value == true;
+        public function __set($name, $value){
+            if($name == 'user_id'){
+                $this->_user_id = $value;
+                return;
             }
 
-            $result = $this->_client->user->hasPermission(array(
-                "user_id" => $this->user_id,
-                "permission" => $permission
-            ));
+            if($value != $this->_data->$name){
+                $this->_changed[$name] = true;
+                $this->_data->$name = $value;
+            }
+        }
 
-            return count($result->missing_permissions) == 0;
+        public function hasPermission($permission){
+            try {
+                if($this->_loaded){
+                    return isset($this->permission->$permission)
+                        && $this->permission->$permission->value == true;
+                }
+
+                $result = $this->_client->user->hasPermission(array(
+                    "user_id" => $this->user_id,
+                    "permission" => $permission
+                ));
+
+                return count($result->missing_permissions) == 0;
+            }catch(ServiceException $exception){
+                switch($exception->getErrorCode()){
+                    case 'INVALID_CREDENTIALS':
+                        return false;
+                    default:
+                        throw $exception;
+                }
+            }
         }
 
         public function hasFeature($feature){
@@ -61,6 +84,22 @@
             ));
 
             return count($result->missing_permissions) == 0;
+        }
+
+        public function save(){
+            $data = array();
+
+            $data["user_id"] = $this->_user_id;
+
+            foreach($this->_changed as $key => $z){
+                $data[$key] = $this->_data[$key];
+            }
+
+            $data["properties"] = $this->_data->properties;
+            $data["features"] = $this->_data->features;
+            $data["permissions"] = $this->_data->permissions;
+
+            return $this->_client->user->save($data);
         }
 
         public function logout(){

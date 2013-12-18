@@ -90,6 +90,32 @@
             }
         }
 
+        public static function loginWithToken($token){
+            try{
+                self::setToken($token);
+
+                $result = self::getClient()->user->get(array(
+                    "user_id" => 'self'
+                ));
+
+                $session = self::getSession();
+                $session->set('ua_token', $token);
+                $session->set('ua_user_id', $result->user_id);
+
+                return true;
+            }catch(ServiceException $exception){
+                switch($exception->getErrorCode()){
+                    case "INVALID_ARGUMENT_LOGIN":
+                    case "INVALID_ARGUMENT_PASSWORD":
+                        return false;
+                        break;
+                    default:
+                        throw $exception;
+                        break;
+                }
+            }
+        }
+
         public static function setAppId($app_id){
             self::getClient()->setOption('app_id', $app_id);
         }
