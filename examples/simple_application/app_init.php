@@ -1,7 +1,7 @@
 <?php
 
 	use \UserApp\Widget\User;
-	require(dirname(__FILE__) . '\\..\..\autoload.php');
+	require(dirname(__FILE__) . '/../../autoload.php');
 
 	// Find your App Id and Token:
 	// App Id: https://help.userapp.io/customer/portal/articles/1322336-how-do-i-find-my-app-id-
