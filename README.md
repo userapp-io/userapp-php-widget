@@ -56,7 +56,7 @@ Wraps the UserApp PHP client into a small and user-friendly API.
     $user = User::current();
     $user->logout();
 
-### Reading a property off a user
+### Reading a property of a user
 
     $user->user_id
 #
