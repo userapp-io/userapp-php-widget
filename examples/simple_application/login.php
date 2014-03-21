@@ -10,7 +10,12 @@
 		if(!User::authenticated()){
 			$email = $_POST["email"];
 			$password = $_POST["password"];
-			$valid_credentials = User::login($email, $password);
+			
+			try{
+				$valid_credentials = User::login($email, $password);
+			}catch(\UserApp\Exceptions\ServiceException $exception){
+				$valid_credentials = true;
+			}
 		}
 	}
 
