@@ -34,7 +34,9 @@
                     $authenticated = false;
                 }*/
 
-                if(!$authenticated){
+                if($authenticated){
+                    self::setToken($session->get("ua_token"));
+                }else{
                     $session = self::getSession();
                     $session->remove("ua_token");
                     $session->remove("ua_user_id");
