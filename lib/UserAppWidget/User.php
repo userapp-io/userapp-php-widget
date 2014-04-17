@@ -43,6 +43,8 @@
                 return;
             }
 
+            $this->load();
+
             if($value != $this->_data->$name){
                 $this->_changed[$name] = true;
                 $this->_data->$name = $value;
