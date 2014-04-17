@@ -94,7 +94,7 @@
             $data["user_id"] = $this->_user_id;
 
             foreach($this->_changed as $key => $z){
-                $data[$key] = $this->_data[$key];
+                $data[$key] = $this->_data->$key;
             }
 
             $data["properties"] = $this->_data->properties;
