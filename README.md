@@ -86,19 +86,15 @@ Wraps the UserApp PHP client into a small and user-friendly API.
 
     bool $user->hasFeature($feature_name)
 
-### Setting a property on a user
+### Saving changes on a user
+
+	bool $user->save()
+
+#### Example
 
 	$user->first_name = 'John';
-	$user->save();
-
-### Setting a feature on a user
-
-	$user->features->my_feature = true;
-	$user->save();
-
-### Setting a custom property on a user
-
-	$user->properties->my_property = 'Some value';
+	$user->last_name = 'Johnsson';
+	$user->properties->my_own_property = 'some value';
 	$user->save();
 
 ### Logging out a user

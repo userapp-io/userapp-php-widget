@@ -122,8 +122,16 @@
             self::getClient()->setOption('app_id', $app_id);
         }
 
+        public static function getAppId(){
+            self::getClient()->getOption('app_id');
+        }
+
         public static function setToken($token){
             self::getClient()->setOption('token', $token);
+        }
+
+        public static function getToken(){
+            return self::getClient()->getOption('token');
         }
 
         public static function getClient(){

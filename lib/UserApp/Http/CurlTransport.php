@@ -2,6 +2,7 @@
 
 	namespace UserApp\Http;
 
+	use \UserApp\Logging\ILogger;
 	use \InvalidArgumentException;
 	use \UserApp\Exceptions\TransportException;
 	use \UserApp\Exceptions\NotSupportedException;
@@ -12,12 +13,20 @@
 
 		private $_handle;
 		private $_verify_ssl;
+		private $_logger;
 
-		public function __construct($verify_ssl = true){
+		public function __construct($verify_ssl = true, $ssl_ca_path = null, ILogger $logger = null){
 			if (!function_exists('curl_init')) {
 				throw new NotSupportedException('This transport requires that the cURL PHP extension is installed.');
 			}
+
+			if($ssl_ca_path === null){
+				$ssl_ca_path = realpath(dirname(__FILE__)) . "/Certs/cacert.pem";
+			}
+
 			$this->_verify_ssl = (bool)$verify_ssl;
+			$this->_ssl_ca_path = $ssl_ca_path;
+			$this->_logger = $logger;
 		}
 
 		private function getHandle(){
@@ -58,6 +67,9 @@
 			if(strpos($url, "https://") === 0){
 				$options[CURLOPT_SSL_VERIFYHOST] = $this->_verify_ssl ? self::SSL_VERIFY_NAME_AND_HOST : false;
 				$options[CURLOPT_SSL_VERIFYPEER] = $this->_verify_ssl;
+				if(defined('CURLOPT_CAINFO') && $this->_ssl_ca_path !== null){
+					$options[CURLOPT_CAINFO] = $this->_ssl_ca_path;
+				}
 			}
 
 			foreach($options as $option => $value){
@@ -69,6 +81,8 @@
 			if($result === false){
 				throw new TransportException("cURL error: " . curl_error($handle));
 			}
+
+			$this->log("Received response: " . $result);
 
 			return Response::fromRaw($result);
 		}
@@ -103,6 +117,14 @@
 			if($this->_handle != null){
 				curl_close($this->_handle);
 				$this->_handle = null;
+			}
+		}
+
+		// Helpers
+
+		private function log($message){
+			if($this->_logger != null){
+				$this->_logger->log($message);
 			}
 		}
 	}

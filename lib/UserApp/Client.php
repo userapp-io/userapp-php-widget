@@ -11,7 +11,7 @@
 	use \UserApp\Exceptions\ServiceException;
 	use \UserApp\Exceptions\TransportException;
 	use \UserApp\Exceptions\InvalidConfigurationException;
-
+	
 	class Client extends ClientBase {
 		const CLIENT_VERSION = "0.1";
 
@@ -60,7 +60,7 @@
 			);
 
 			if($this->debugMode()){
-				$this->log(sprintf("Sending POST request to '%s' with headers '%s' and body '%s'.",
+				$this->log(sprintf("Sending POST Request to '%s' with headers '%s' and body '%s'.",
 					$service_url, json_encode($headers), json_encode($arguments)));
 			}
 
@@ -68,12 +68,12 @@
 			$this->assertResponse($response);
 
 			if($response->status->code != 200){
-				throw new TransportException(sprintf("Expected 200 OK response. Recieved %s %s.",
+				throw new TransportException(sprintf("Expected 200 OK response. Received %s %s.",
 					$response->status->code, $response->status->message));
 			}
 
 			if($this->debugMode()){
-				$this->log(sprintf("Recieved response with status '%s' and headers '%s'.",
+				$this->log(sprintf("Received response with status '%s' and headers '%s'.",
 					json_encode($response->status), json_encode($response->headers)));
 			}
 
@@ -155,7 +155,11 @@
 
 		private function assertConfiguration(){
 			if(!is_string($this->_options->base_address) || strlen($this->_options->base_address) == 0){
-				throw new InvalidConfigurationException("Base Address must be a string value with at least 1 character.");
+				throw new InvalidConfigurationException("Base Address cannot be empty.");
+			}
+
+			if(!is_string($this->_options->app_id) || strlen($this->_options->app_id) == 0){
+				throw new InvalidConfigurationException("App Id cannot be empty.");
 			}
 		}
 
