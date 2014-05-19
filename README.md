@@ -41,7 +41,7 @@ Wraps the UserApp PHP client into a small and user-friendly API.
 
 ### Signing up a new user
 
-    bool User::signup($username, $password, $email = null, $auto_login = true)
+    bool User::signup($username, $password, $email = null, $first_name = null, $last_name = null, $auto_login = true)
 
 ### Checking if a user is authenticated
 

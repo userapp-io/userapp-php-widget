@@ -48,12 +48,14 @@
             return self::$_authenticated;
         }
 
-        public static function signup($username, $password, $email = null, $auto_login = true){
+        public static function signup($username, $password, $email = null, $first_name = null, $last_name = null, $auto_login = true){
             try{
                 self::getClient()->user->save(array(
                     "login" => $username,
                     "password" => $password,
                     "email" => $email,
+                    "first_name" => $first_name,
+                    "last_name" => $last_name,
                     "ip_address" => self::getRemoteAddress() // Provide the IP of the real user
                 ));
 
