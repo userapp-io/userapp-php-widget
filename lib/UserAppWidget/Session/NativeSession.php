@@ -4,7 +4,7 @@
 
     class NativeSession implements ISession {
         public function __construct(){
-            if(session_status() == PHP_SESSION_NONE){
+            if(!self::sessionStarted()){
                 session_start();
             }
         }
@@ -23,6 +23,18 @@
 
         public function remove($key){
             unset($_SESSION[$key]);
+        }
+
+        private static function sessionStarted(){
+            if(function_exists('session_id') && session_id() != '') {
+                return true;
+            }
+
+            if(function_exists('session_status') && session_status() != PHP_SESSION_NONE){
+                return true;
+            }
+
+            return false;
         }
     }
 
