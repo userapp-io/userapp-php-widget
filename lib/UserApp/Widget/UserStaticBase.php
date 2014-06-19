@@ -3,6 +3,7 @@
     namespace UserApp\Widget;
     use \UserApp\Widget\Session\ISession;
     use \UserApp\Widget\Session\NativeSession;
+    use \UserApp\Exceptions\ServiceException;
 
     abstract class UserStaticBase {
         private static $_user;
