@@ -9,15 +9,20 @@
         private static $_client;
         private static $_session;
         private static $_authenticated;
+        private static $_heartbeat_handler;
 
         public static function current(){
             if(self::$_user == null && self::authenticated()){
                 $session = self::getSession();
-                self::$_user = new User(
-                    self::getClient()->getOption("app_id"),
-                    $session->get("ua_token"),
-                    $session->get("ua_user_id")
-                );
+                $user_client = new \UserApp\API(self::getClient()->getOption("app_id"), $session->get("ua_token"));
+
+                $user_client->on('success', function($sender, $call_context, $error) use ($session){
+                    if(!($call_context->service == 'user' && $call_context->method == 'logout')){
+                        $session->set('ua_last_heartbeat_at', time());
+                    }
+                });
+
+                self::$_user = new User($user_client, $session->get("ua_user_id"));
             }
             return self::$_user;
         }
@@ -27,22 +32,42 @@
 
             if(self::$_authenticated != true && $session->has("ua_token")){
                 $authenticated = true;
-
-                /*try {
-                    self::getClient()->token->heartbeat();
-                }catch(Exception $exception){
-                    $authenticated = false;
-                }*/
+                $ten_min_in_sec = 60*30;
 
                 if($authenticated){
                     self::setToken($session->get("ua_token"));
                 }else{
-                    $session = self::getSession();
                     $session->remove("ua_token");
                     $session->remove("ua_user_id");
+                    $session->remove("ua_last_heartbeat_at");
                 }
 
                 self::$_authenticated = $authenticated;
+            }
+
+            $last_heartbeat_at = $session->get("ua_last_heartbeat_at");
+
+            if(self::$_heartbeat_handler === null){
+                self::$_heartbeat_handler = self::getClient()->on('success', function($sender, $call_context, $error) use ($session){
+                    if(!($call_context->service == 'user' && $call_context->method == 'logout')){
+                        $session->set('ua_last_heartbeat_at', time());
+                    }
+                });
+            }
+
+            // Make a heartbeat request if none is made or last request was made over 10 minutes ago
+            if(empty($last_heartbeat_at) || ($last_heartbeat_at+$ten_min_in_sec) < time()){
+                try {
+                    self::getClient()->token->heartbeat();
+                    $session->set("ua_last_heartbeat_at", time());
+                }catch(ServiceException $exception){
+                    switch($exception->getErrorCode()){
+                        case "INVALID_CREDENTIALS":
+                        case "UNAUTHORIZED":
+                            $authenticated = false;
+                            break;
+                    }
+                }
             }
 
             return self::$_authenticated;
@@ -79,6 +104,7 @@
                 $session = self::getSession();
                 $session->set('ua_token', $result->token);
                 $session->set('ua_user_id', $result->user_id);
+                $session->set('ua_last_heartbeat_at', time());
 
                 return true;
             }catch(ServiceException $exception){
@@ -105,6 +131,7 @@
                 $session = self::getSession();
                 $session->set('ua_token', $token);
                 $session->set('ua_user_id', $result[0]->user_id);
+                $session->set('ua_last_heartbeat_at', time());
 
                 return true;
             }catch(ServiceException $exception){
@@ -139,8 +166,6 @@
         public static function getClient(){
             if(self::$_client === null){
                 $client = self::$_client = new \UserApp\API();
-                $client->setOption("debug", true);
-                $client->setTransport(new \UserApp\Http\CurlTransport(false));
             }
             return self::$_client;
         }
@@ -148,8 +173,6 @@
         public static function getUserClient(){
             if(self::$_client === null){
                 $client = self::$_client = new \UserApp\API();
-                $client->setOption("debug", true);
-                $client->setTransport(new \UserApp\Http\CurlTransport(false));
             }
             return self::$_client;
         }

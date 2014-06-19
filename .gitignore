@@ -16,6 +16,15 @@ local.properties
 .settings/
 .loadpath
 
+# Composor
+vendor
+composer.phar
+composer.lock
+
+# Misc
+phpunit.xml
+.DS_Store
+
 # External tool builders
 .externalToolBuilders/
 

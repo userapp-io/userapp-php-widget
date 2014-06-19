@@ -1,0 +1,22 @@
+{
+    "name": "userapp/widget",
+    "type": "library",
+    "description": "PHP user widget for UserApp.",
+    "keywords": ["user management", "user authentication", "user helper"],
+    "homepage": "http://github.com/userapp-io/userapp-php-widget",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Robin Orheden",
+            "email": "robin.orheden@userapp.io",
+            "homepage": "https://www.userapp.io/"
+        }
+    ],
+    "require": {
+        "userapp/userapp": "1.0.0"
+    },
+    "autoload": {
+        "psr-0": {"UserApp\\Widget\\": "lib/"}
+    },
+    "minimum-stability": "dev" 
+}

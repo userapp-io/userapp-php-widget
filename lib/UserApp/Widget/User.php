@@ -10,18 +10,18 @@
         private $_client;
         private $_user_id;
         private $_data = null;
+        private $_data_last_load = null;
         private $_loaded = false;
         private $_changed = array();
 
-		public function __construct($app_id, $session_token, $user_id){
-            $client = $this->_client = new \UserApp\API($app_id, $session_token);
-
-            if($client->getOptions()->debug){
-                $client->setTransport(new \UserApp\Http\CurlTransport(false));
-            }
-
+		public function __construct($client, $user_id){
+            $this->_client = $client;
             $this->_user_id = $user_id;
 		}
+
+        public function on($event_name, callable $callback, $priority = 100){
+            $this->_client->on($event_name, $callback, $priority);
+        }
 
         public function __get($name){
             if($name == 'user_id'){
@@ -31,7 +31,7 @@
             $this->load();
 
             if(!property_exists($this->_data, $name)){
-                throw new Exception("Property does not exist");
+                throw new Exception(sprintf("Property '%s' does not exist.", $name));
             }
 
             return $this->_data->$name;
@@ -54,8 +54,8 @@
         public function hasPermission($permission){
             try {
                 if($this->_loaded){
-                    return isset($this->permission->$permission)
-                        && $this->permission->$permission->value == true;
+                    return isset($this->permissions->$permission)
+                        && $this->permissions->$permission->value == true;
                 }
 
                 $result = $this->_client->user->hasPermission(array(
@@ -89,19 +89,14 @@
         }
 
         public function save(){
-            $data = array();
+            $previous_data = (array)$this->_data_last_load;
 
-            $data["user_id"] = $this->_user_id;
+            $current_data = self::objectToArray($this->_data);
 
-            foreach($this->_changed as $key => $z){
-                $data[$key] = $this->_data->$key;
-            }
+            $data_diff = self::recursiveArrayDiff($current_data, $previous_data);
+            $data_diff['user_id']=$this->_user_id;
 
-            $data["properties"] = $this->_data->properties;
-            $data["features"] = $this->_data->features;
-            $data["permissions"] = $this->_data->permissions;
-
-            return $this->_client->user->save($data);
+            $this->setData($this->_client->user->save($data_diff));
         }
 
         public function logout(){
@@ -109,17 +104,13 @@
 
             $session->remove('ua_token');
             $session->remove('ua_user_id');
+            $session->remove('ua_last_heartbeat_at');
 
             try {
                 $this->_client->user->logout();
             }catch(\UserApp\Exceptions\ServiceException $exception){
-                if($exception->getErrorCode() == 'INVALID_CREDENTIALS'){
-                    return false;
-                }
-                throw $exception;
+                // Just discard.
             }
-
-            return true;
         }
 
         private function load(){
@@ -129,7 +120,49 @@
 
             $this->_loaded = true;
 
-            $this->_data = current($this->_client->user->get());
+            $this->setData(current($this->_client->user->get()));
+        }
+
+        private function setData($data){
+            $this->_data = $data;
+            $this->_data_last_load = self::objectToArray($data);
+        }
+
+        private static function recursiveArrayDiff($a1, $a2) { 
+            $r = array();
+
+            foreach ($a1 as $k => $v) {
+                if (array_key_exists($k, $a2)) { 
+                    if (is_array($v)) { 
+                        $rad = self::recursiveArrayDiff($v, $a2[$k]); 
+                        if (count($rad)) { $r[$k] = $rad; } 
+                    } else { 
+                        if ($v != $a2[$k]) { 
+                            $r[$k] = $v; 
+                        }
+                    }
+                } else { 
+                    $r[$k] = $v; 
+                } 
+            }
+            return $r; 
+        }
+
+        private static function objectToArray($obj) {
+            if(is_object($obj)){
+                $obj = (array) $obj;
+            }
+
+            if(is_array($obj)) {
+                $new = array();
+                foreach($obj as $key => $val) {
+                    $new[$key] = self::objectToArray($val);
+                }
+            }else{
+                $new = $obj;
+            }
+
+            return $new;       
         }
 	}
 
