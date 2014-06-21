@@ -30,10 +30,10 @@
 
         public static function authenticated(){
             $session = self::getSession();
+            $ten_min_in_sec = 60*30;
 
             if(self::$_authenticated != true && $session->has("ua_token")){
                 $authenticated = true;
-                $ten_min_in_sec = 60*30;
 
                 if($authenticated){
                     self::setToken($session->get("ua_token"));
