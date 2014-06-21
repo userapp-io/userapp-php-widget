@@ -1,6 +1,6 @@
 <?php
 
-	namespace UserApp\Widget\Session;
+    namespace UserApp\Widget\Session;
 
     class NativeSession implements ISession {
         public function __construct(){
@@ -14,7 +14,7 @@
         }
 
         public function get($key){
-            return $_SESSION[$key];
+            return $this->has($key) ? $_SESSION[$key] : null;
         }
 
         public function set($key, $value){
@@ -22,7 +22,9 @@
         }
 
         public function remove($key){
-            unset($_SESSION[$key]);
+            if($this->has($key)){
+                unset($_SESSION[$key]);
+            }
         }
 
         private static function sessionStarted(){

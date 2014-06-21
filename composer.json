@@ -13,7 +13,7 @@
         }
     ],
     "require": {
-        "userapp/userapp": "1.0.0"
+        "userapp/userapp": "~1.0.0"
     },
     "autoload": {
         "psr-0": {"UserApp\\Widget\\": "lib/"}
