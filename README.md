@@ -2,6 +2,33 @@
 
 Wraps the UserApp PHP client into a small and user-friendly API.
 
+## Getting started
+
+### Finding your App Id and Token
+
+If you don't have a UserApp account, you need to [create one](https://app.userapp.io/#/sign-up/).
+
+* **App Id**: The App Id identifies your app. After you have logged in, you should see your `App Id` instantly. If you're having trouble finding it, [follow this guide](https://help.userapp.io/customer/portal/articles/1322336-how-do-i-find-my-app-id-).
+
+*  **Token**: A token authenticates a user on your app. If you want to create a token for your logged in user, [follow this guide](https://help.userapp.io/customer/portal/articles/1364103-how-do-i-create-an-api-token-). If you want to authenticate using a username/password, you can acquire your token by calling `$api->user->login(...);`
+
+### Loading the library
+
+UserApp relies on the autoloading features of PHP to load its files when needed. The autoloading complies with the PSR-0 standard which makes it compatible with most of the major frameworks and libraries. Autoloading in your application is handled automatically when managing the dependencies with [Composer](https://packagist.org/packages/userapp/userapp).
+    
+#### Using Composer? Add this to your `composer.json`
+
+	{
+		"require": {
+			"userapp/widget": "~0.5.5"
+		}
+	}
+
+#### Not using Composer? Use the library's own autoloader
+
+    require 'lib/Autoloader.php';
+    UserApp\Widget\Autoloader::register();
+
 ## Example
 	
 	use \UserApp\Widget\User;
@@ -88,7 +115,7 @@ Wraps the UserApp PHP client into a small and user-friendly API.
 
 ### Saving changes on a user
 
-	bool $user->save()
+	void $user->save()
 
 #### Example
 
