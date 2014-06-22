@@ -1,6 +1,7 @@
 <?php
 
     namespace UserApp\Widget;
+    
     use \UserApp\Widget\Session\ISession;
     use \UserApp\Widget\Session\NativeSession;
     use \UserApp\Exceptions\ServiceException;
@@ -12,7 +13,7 @@
         private static $_authenticated;
         private static $_heartbeat_handler;
 
-        public function onUnauthorized($callback){
+        public static function onUnauthorized($callback){
             return self::getClient()->on('unauthorized', $callback);
         }
 
