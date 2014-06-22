@@ -12,6 +12,10 @@
         private static $_authenticated;
         private static $_heartbeat_handler;
 
+        public function onUnauthorized($callback){
+            return self::getClient()->on('unauthorized', $callback);
+        }
+
         public static function current(){
             if(self::$_user == null && self::authenticated()){
                 $session = self::getSession();

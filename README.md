@@ -30,31 +30,71 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
     UserApp\Widget\Autoloader::register();
 
 ## Example
+
+### bootstrap.php
+
+	use \UserApp\Widget\User;
+	
+	// Import composer autoloader
+	require_once('vendor/autoload.php');
+	
+	User::setAppId("YOUR APP ID");
+
+### must_authenticate.php
 	
 	use \UserApp\Widget\User;
 	
-	User::setAppId("YOUR APP ID");
+	require_once('bootstrap.php');
 	
-	if(!User::authenticated()){
-		if(User::login("epic", "catrider11!")){
-			echo("Successfully logged in<br />\n");
-		}else{
-			echo("Invalid username or password.<br />\n");
-		}
-	}
+	User::onUnauthorized(function($sender, call_context, $error){
+	    header('Location: /login.php');
+	    die();
+	}))
 	
-	if(User::authenticated()){
-		$user = User::current();
+### login.php
+
+    <?php
+    
+	    use \UserApp\Widget\User;
+	    
+        require_once('bootstrap.php');
+    
+        if(isset($_POST)){
+            $redirect_to = '/login.php';
+            
+            if(User::login($_POST['username'], $_POST['password'])){
+                $redirect_to = 'user/profile.php';
+            }
+            
+            header('Location: '.$redirect_to);
+            die();
+        }
+      
+     ?>
+
+    <form method="post">
+        Username: <input type="text" name="username" /><br />
+        Password: <input type="password" name="password" /><br />
+        <input type="submit" value="Log in" />
+    </form>
+
+### user/profile.php
+
+    require_once('../must_authenticate.php');
+
+	$user = User::current();
 		
-		if($user->hasPermission("admin")){
-			echo("User is admin!\n");
-		}
-		
-		echo("User id: " . $user->user_id . "<br />\n");
-		echo("First name: " . $user->first_name);
-		
-		$user->logout();
-	}
+	echo("User id: " . $user->user_id . "<br />\n");
+	echo("First name: " . $user->first_name . "<br /><br />\n\n");
+	
+	echo("<a href='logout.php'>Logout</a>")
+	
+### user/logout.php
+
+    require_once('../must_authenticate.php');
+
+	$user = User::current();
+	$user->logout();
 
 ## API
 
