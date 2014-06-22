@@ -33,6 +33,8 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
 
 ### bootstrap.php
 
+    <?php
+    
 	use \UserApp\Widget\User;
 	
 	// Import composer autoloader
@@ -41,6 +43,8 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
 	User::setAppId("YOUR APP ID");
 
 ### must_authenticate.php
+	
+	<?php
 	
 	use \UserApp\Widget\User;
 	
@@ -54,23 +58,23 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
 ### login.php
 
     <?php
+
+    use \UserApp\Widget\User;
     
-	    use \UserApp\Widget\User;
-	    
-        require_once('bootstrap.php');
-    
-        if(isset($_POST)){
-            $redirect_to = '/login.php';
-            
-            if(User::login($_POST['username'], $_POST['password'])){
-                $redirect_to = 'user/profile.php';
-            }
-            
-            header('Location: '.$redirect_to);
-            die();
+    require_once('bootstrap.php');
+
+    if(isset($_POST)){
+        $redirect_to = '/login.php';
+        
+        if(User::login($_POST['username'], $_POST['password'])){
+            $redirect_to = '/user/profile.php';
         }
-      
-     ?>
+        
+        header('Location: ' . $redirect_to);
+        die();
+    }
+    
+    ?>
 
     <form method="post">
         Username: <input type="text" name="username" /><br />
@@ -80,6 +84,8 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
 
 ### user/profile.php
 
+    <?php
+    
     require_once('../must_authenticate.php');
 
 	$user = User::current();
@@ -91,6 +97,8 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
 	
 ### user/logout.php
 
+    <?php
+    
     require_once('../must_authenticate.php');
 
 	$user = User::current();
