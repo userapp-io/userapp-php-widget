@@ -20,7 +20,7 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
 
 	{
 		"require": {
-			"userapp/widget": "~0.5.7"
+			"userapp/widget": "~0.6.0"
 		}
 	}
 
