@@ -163,13 +163,13 @@
                         "sms" => array(
                             "override" => false
                     )),
-                    "user_id" => "666"
+                    "user_id" => "self"
                 );
 
                 if($url == 'https://api.userapp.io/v1/user.save'){
                     if($body == json_encode($user_save_data_compare)){
                         return array(
-                            'user_id' => '666',
+                            'user_id' => 'self',
                             'login' => 'root',
                             'properties' => array(
                                 'age' => array(
@@ -190,7 +190,7 @@
                                 )
                             ),
                             'updated_at' => time(),
-                            'created_at' => $data->created_at
+                            'created_at' => time()
                         );
                     }
                 }

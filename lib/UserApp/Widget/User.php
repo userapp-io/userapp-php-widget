@@ -1,12 +1,12 @@
 <?php
 
-	namespace UserApp\Widget;
+    namespace UserApp\Widget;
 
     use \stdClass;
-	use \Exception;
+    use \Exception;
     use \UserApp\Exceptions\ServiceException;
 
-	class User extends UserStaticBase {
+    class User extends UserStaticBase {
         private $_client;
         private $_user_id;
         private $_data = null;
@@ -14,10 +14,10 @@
         private $_loaded = false;
         private $_changed = array();
 
-		public function __construct($client, $user_id){
+        public function __construct($client, $user_id){
             $this->_client = $client;
             $this->_user_id = $user_id;
-		}
+        }
 
         public function on($event_name, callable $callback, $priority = 100){
             $this->_client->on($event_name, $callback, $priority);
@@ -59,7 +59,7 @@
                 }
 
                 $result = $this->_client->user->hasPermission(array(
-                    "user_id" => $this->user_id,
+                    "user_id" => "self",
                     "permission" => $permission
                 ));
 
@@ -81,7 +81,7 @@
             }
 
             $result = $this->_client->user->hasFeature(array(
-                "user_id" => $this->user_id,
+                "user_id" => "self",
                 "permission" => $permission
             ));
 
@@ -94,7 +94,7 @@
             $current_data = self::objectToArray($this->_data);
 
             $data_diff = self::recursiveArrayDiff($current_data, $previous_data);
-            $data_diff['user_id']=$this->_user_id;
+            $data_diff['user_id']="self";
 
             $this->setData($this->_client->user->save($data_diff));
         }
@@ -164,6 +164,6 @@
 
             return $new;       
         }
-	}
+    }
 
 ?>
