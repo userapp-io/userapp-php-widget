@@ -20,7 +20,7 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
 
 	{
 		"require": {
-			"userapp/widget": "~0.5.6"
+			"userapp/widget": "~0.5.7"
 		}
 	}
 
@@ -53,7 +53,7 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
 	User::onUnauthorized(function($sender, call_context, $error){
 	    header('Location: /login.php');
 	    die();
-	}))
+	}));
 	
 ### login.php
 
