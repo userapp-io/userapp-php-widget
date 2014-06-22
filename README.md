@@ -33,76 +33,90 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
 
 ### bootstrap.php
 
-    <?php
-    
+	<?php
+
 	use \UserApp\Widget\User;
-	
+
 	// Import composer autoloader
 	require_once('vendor/autoload.php');
-	
-	User::setAppId("YOUR APP ID");
+
+	User::setAppId("51ded0be98035");
 
 ### must_authenticate.php
 	
 	<?php
-	
+
 	use \UserApp\Widget\User;
-	
+
 	require_once('bootstrap.php');
-	
-	User::onUnauthorized(function($sender, call_context, $error){
-	    header('Location: /login.php');
+
+	User::onUnauthorized(function ($sender, $call_context, $error){
+	    header('Location: login.php');
 	    die();
-	}));
+	});
 	
 ### login.php
 
-    <?php
+	<?php
 
-    use \UserApp\Widget\User;
-    
-    require_once('bootstrap.php');
+	use \UserApp\Widget\User;
 
-    if(isset($_POST)){
-        $redirect_to = '/login.php';
-        
-        if(User::login($_POST['username'], $_POST['password'])){
-            $redirect_to = '/user/profile.php';
-        }
-        
-        header('Location: ' . $redirect_to);
-        die();
-    }
-    
-    ?>
+	require_once('bootstrap.php');
 
-    <form method="post">
-        Username: <input type="text" name="username" /><br />
-        Password: <input type="password" name="password" /><br />
-        <input type="submit" value="Log in" />
-    </form>
+	if($_SERVER['REQUEST_METHOD'] === 'POST'){
+	    $redirect_to = 'login.php?error=INVALID_CREDENTIALS';
+
+	    if(User::login($_POST['username'], $_POST['password'])){
+	        $redirect_to = 'user/profile.php';
+	    }
+
+	    header('Location: /~orhedenr/test/' . $redirect_to);
+	    die();
+	}
+
+	?>
+
+	<form method="post">
+	    Username: <input type="text" name="username" /><br />
+	    Password: <input type="password" name="password" /><br />
+		
+		<?php if(isset($_GET['error']) && $_GET['error'] == 'INVALID_CREDENTIALS'){ ?>
+			* Invalid username or password<br />
+		<?php } ?>
+
+	    <input type="submit" value="Log in" />
+	</form>
 
 ### user/profile.php
 
-    <?php
-    
-    require_once('../must_authenticate.php');
+	<?php
+
+	use \UserApp\Widget\User;
+
+	require_once('../must_authenticate.php');
 
 	$user = User::current();
-		
-	echo("User id: " . $user->user_id . "<br />\n");
-	echo("First name: " . $user->first_name . "<br /><br />\n\n");
-	
+
+	echo("User id: " . $user->user_id . "<br /><br />\n\n");
+	echo("Username: " . ($user->login ?: '(not specified)'). "<br />\n");
+	echo("First name: " . ($user->first_name ?: '(not specified)') . "<br />\n");
+	echo("Last name: " . ($user->last_name ?: '(not specified)') . "<br />\n");
+	echo("Email: " . ($user->email ?: '(not specified)'). "<br /><br />\n\n");
+
 	echo("<a href='logout.php'>Logout</a>");
 	
 ### user/logout.php
 
-    <?php
-    
-    require_once('../must_authenticate.php');
+	<?php
+
+	use \UserApp\Widget\User;
+
+	require_once('../must_authenticate.php');
 
 	$user = User::current();
 	$user->logout();
+
+	header('Location: ../login.php');
 
 ## API
 
