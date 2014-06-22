@@ -51,7 +51,7 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
 	require_once('bootstrap.php');
 
 	User::onUnauthorized(function ($sender, $call_context, $error){
-	    header('Location: login.php');
+	    header('Location: /login.php');
 	    die();
 	});
 	
@@ -70,7 +70,7 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
 	        $redirect_to = 'user/profile.php';
 	    }
 
-	    header('Location: /~orhedenr/test/' . $redirect_to);
+	    header('Location: /' . $redirect_to);
 	    die();
 	}
 
