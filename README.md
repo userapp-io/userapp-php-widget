@@ -93,7 +93,7 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
 	echo("User id: " . $user->user_id . "<br />\n");
 	echo("First name: " . $user->first_name . "<br /><br />\n\n");
 	
-	echo("<a href='logout.php'>Logout</a>")
+	echo("<a href='logout.php'>Logout</a>");
 	
 ### user/logout.php
 
