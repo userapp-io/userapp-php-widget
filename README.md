@@ -40,7 +40,7 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
 	// Import composer autoloader
 	require_once('vendor/autoload.php');
 
-	User::setAppId("51ded0be98035");
+	User::setAppId("YOUR APP ID");
 
 ### must_authenticate.php
 	
