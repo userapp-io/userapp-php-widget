@@ -118,6 +118,17 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
 
 ## API
 
+### Callback when unauthorized
+
+    void onUnauthorized(closure($sender, $call_context, $error))
+    
+#### Example
+
+    User::onUnauthorized(function($sender, $call_context, $error){
+        header('Location: /login.php');
+        die();
+    });
+
 ### Logging in
 
     bool User::login($username, $password)
@@ -175,14 +186,14 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
 
 ### Saving changes on a user
 
-	void $user->save()
+    void $user->save()
 
 #### Example
 
-	$user->first_name = 'John';
-	$user->last_name = 'Johnsson';
-	$user->properties->my_own_property = 'some value';
-	$user->save();
+    $user->first_name = 'John';
+    $user->last_name = 'Johnsson';
+    $user->properties->my_own_property = 'some value';
+    $user->save();
 
 ### Logging out a user
 
