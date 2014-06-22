@@ -39,7 +39,7 @@
             if($session->has("ua_token")){
                 $ten_min_in_sec = 60*30;
 
-                if(self::$_authenticated != true){
+                if(!self::$_authenticated){
                     self::$_authenticated = true;
                     self::setToken($session->get("ua_token"));
                 }
