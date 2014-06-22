@@ -35,43 +35,37 @@
 
         public static function authenticated(){
             $session = self::getSession();
-            $ten_min_in_sec = 60*30;
 
-            if(self::$_authenticated != true && $session->has("ua_token")){
-                $authenticated = true;
+            if($session->has("ua_token")){
+                $ten_min_in_sec = 60*30;
 
-                if($authenticated){
+                if(self::$_authenticated != true){
+                    self::$_authenticated = true;
                     self::setToken($session->get("ua_token"));
-                }else{
-                    $session->remove("ua_token");
-                    $session->remove("ua_user_id");
-                    $session->remove("ua_last_heartbeat_at");
                 }
 
-                self::$_authenticated = $authenticated;
-            }
+                $last_heartbeat_at = $session->get("ua_last_heartbeat_at");
 
-            $last_heartbeat_at = $session->get("ua_last_heartbeat_at");
+                if(self::$_heartbeat_handler === null){
+                    self::$_heartbeat_handler = self::getClient()->on('success', function($sender, $call_context, $error) use ($session){
+                        if(!($call_context->service == 'user' && $call_context->method == 'logout')){
+                            $session->set('ua_last_heartbeat_at', time());
+                        }
+                    });
+                }
 
-            if(self::$_heartbeat_handler === null){
-                self::$_heartbeat_handler = self::getClient()->on('success', function($sender, $call_context, $error) use ($session){
-                    if(!($call_context->service == 'user' && $call_context->method == 'logout')){
-                        $session->set('ua_last_heartbeat_at', time());
-                    }
-                });
-            }
-
-            // Make a heartbeat request if none is made or last request was made over 10 minutes ago
-            if(empty($last_heartbeat_at) || ($last_heartbeat_at+$ten_min_in_sec) < time()){
-                try {
-                    self::getClient()->token->heartbeat();
-                    $session->set("ua_last_heartbeat_at", time());
-                }catch(ServiceException $exception){
-                    switch($exception->getErrorCode()){
-                        case "INVALID_CREDENTIALS":
-                        case "UNAUTHORIZED":
-                            $authenticated = false;
-                            break;
+                // Make a heartbeat request if none is made or last request was made over 10 minutes ago
+                if(empty($last_heartbeat_at) || ($last_heartbeat_at+$ten_min_in_sec) < time()){
+                    try {
+                        self::getClient()->token->heartbeat();
+                        $session->set("ua_last_heartbeat_at", time());
+                    }catch(ServiceException $exception){
+                        switch($exception->getErrorCode()){
+                            case "INVALID_CREDENTIALS":
+                            case "UNAUTHORIZED":
+                                $authenticated = false;
+                                break;
+                        }
                     }
                 }
             }

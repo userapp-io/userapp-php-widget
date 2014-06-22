@@ -1,13 +1,18 @@
 <?php
 
 	use \UserApp\Widget\User;
-	require(dirname(__FILE__) . '/../../autoload.php');
 
-	// Find your App Id and Token:
+	// Missing vendor/autoload.php? Run `$ composer install` to install the dependencies.
+	require(dirname(__FILE__) . '/vendor/autoload.php');
+
+	// If unauthorized, then redirect to our login page
+	User::onUnauthorized(function($sender, $call_context, $error){
+	    header('Location: /login.php');
+	    die();
+	});
+
+	// Find your App Id
 	// App Id: https://help.userapp.io/customer/portal/articles/1322336-how-do-i-find-my-app-id-
-	// Token: https://help.userapp.io/customer/portal/articles/1364103-how-do-i-create-an-api-token-
-
 	User::setAppId("YOUR APP ID");
-	User::setToken("YOUR TOKEN");
 
 ?>
