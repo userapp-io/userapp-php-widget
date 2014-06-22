@@ -161,7 +161,7 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
 * object properties
 * object features
 * object permissions
-* object lock
+* array locks
 * string ip_address
 * int last\_login_at
 * int updated_at
