@@ -78,9 +78,9 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
 	    Username: <input type="text" name="username" /><br />
 	    Password: <input type="password" name="password" /><br />
 		
-		<?php if(isset($_GET['error']) && $_GET['error'] == 'INVALID_CREDENTIALS'){ ?>
+		<? if(isset($_GET['error']) && $_GET['error'] == 'INVALID_CREDENTIALS'){ ?>
 			* Invalid username or password<br />
-		<?php } ?>
+		<? } ?>
 
 	    <input type="submit" value="Log in" />
 	</form>
@@ -94,14 +94,16 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
 	require_once('../must_authenticate.php');
 
 	$user = User::current();
+	
+	?>
 
-	echo("User id: " . $user->user_id . "<br /><br />\n\n");
-	echo("Username: " . ($user->login ?: '(not specified)'). "<br />\n");
-	echo("First name: " . ($user->first_name ?: '(not specified)') . "<br />\n");
-	echo("Last name: " . ($user->last_name ?: '(not specified)') . "<br />\n");
-	echo("Email: " . ($user->email ?: '(not specified)'). "<br /><br />\n\n");
+	User id: <?= $user->user_id ?><br /><br />
+	Username: <?= ($user->login ?: '(not specified)') ?><br />
+	First name: <?= ($user->first_name ?: '(not specified)') ?><br />
+	Last name: <?= ($user->last_name ?: '(not specified)') ?><br />
+	Email: <?= ($user->email ?: '(not specified)') ?><br />
 
-	echo("<a href='logout.php'>Logout</a>");
+	<a href="logout.php">Logout</a>
 	
 ### user/logout.php
 
@@ -117,17 +119,6 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
 	header('Location: ../login.php');
 
 ## API
-
-### Callback when unauthorized
-
-    void onUnauthorized(closure($sender, $call_context, $error))
-    
-#### Example
-
-    User::onUnauthorized(function($sender, $call_context, $error){
-        header('Location: /login.php');
-        die();
-    });
 
 ### Logging in
 
@@ -198,6 +189,17 @@ UserApp relies on the autoloading features of PHP to load its files when needed.
 ### Logging out a user
 
     void $user->logout()
+
+### Callback when unauthorized
+
+    void onUnauthorized(closure($sender, $call_context, $error))
+    
+#### Example
+
+    User::onUnauthorized(function($sender, $call_context, $error){
+        header('Location: /login.php');
+        die();
+    });
 
 ### Licence
 
